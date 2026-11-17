@@ -1,0 +1,54 @@
+{
+  "output": "系统总体架构图.png",
+  "extraCopyDir": "C:\\Users\\31339\\Desktop",
+  "title": "LabGuard 高校实验室安全准入与预约管理系统 · 系统总体架构图",
+  "subtitle": "后端 Spring Boot 3.5.15 + JDK 21（内嵌 Tomcat）　|　前端 Vue 3.5 + Vite 7　|　数据访问 Spring JDBC　|　数据库 MySQL 5.7.44",
+  "arrowLabel": "HTTP 请求 / JSON 响应",
+  "layers": [
+    {
+      "label": "表示层",
+      "accent": "normal",
+      "items": "登录注册界面 · 安全管理工作台 · 培训学习 · 准入考试 · 实验室预约 · 资格审核 · 资源台账维护",
+      "note": "Vue 3 单页应用（Vue 3.5 + Vite 7），构建产物托管于 Spring Boot 静态资源，与后端同一 8080 端口访问"
+    },
+    {
+      "label": "安全接入层",
+      "accent": "security",
+      "items": "登录态拦截（/api/**） · CSRF 令牌校验 · 安全响应头与请求 ID · 登录失败限流 · 资源级角色权限",
+      "note": "edu.lab.security：AuthInterceptor、CsrfTokenService、LoginRateLimitService、AuthorizationService；Session 会话 30 分钟"
+    },
+    {
+      "label": "接口控制层",
+      "accent": "normal",
+      "items": "REST API（/api/**） · 参数接收与 Bean Validation 校验 · 统一 JSON 响应 · 全局异常处理",
+      "note": "edu.lab.controller：ApiController、GlobalExceptionHandler"
+    },
+    {
+      "label": "业务服务层",
+      "accent": "normal",
+      "items": "用户认证与注册 · 培训学习进度 · 随机组卷与在线判分 · 准入资格审核 · 预约准入校验与冲突检测 · 资源白名单 CRUD · 操作日志审计",
+      "note": "edu.lab.service：AuthService、LearningService、ExamService、QualificationService、ReservationService、ResourceService、AuditLogService，事务由 @Transactional 控制"
+    },
+    {
+      "label": "数据访问层",
+      "accent": "normal",
+      "items": "Spring JdbcTemplate · UserRepository / ReservationRepository · 参数化结构化 SQL · 实体对象映射",
+      "note": "edu.lab.repository 与 edu.lab.entity（15 个实体类），依赖 spring-boot-starter-jdbc"
+    },
+    {
+      "label": "数据存储层",
+      "accent": "storage",
+      "items": "MySQL 5.7.44（lab_safety 库 · 15 张业务数据表） · schema.sql 建表脚本 · data.sql 初始化数据",
+      "note": "HikariCP 连接池（最大 10 个连接），启动时自动建库建表并写入演示数据"
+    }
+  ],
+  "sideband": {
+    "title": "安全保障贯穿各层",
+    "lines": [
+      "BCrypt 密码加密",
+      "资源级角色权限白名单",
+      "操作日志审计留痕"
+    ]
+  },
+  "footer": "说明：箭头表示调用与数据流向。表示层与安全接入层之间为 HTTP 请求 / JSON 响应，其下各层为方法调用；未登录请求由安全接入层直接返回 401，非安全方法须携带 CSRF 令牌。"
+}
